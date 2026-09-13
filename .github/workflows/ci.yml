@@ -1,0 +1,125 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+env:
+  CONAN_REMOTE_URL: ${{ secrets.CONAN_REMOTE_URL }}   # ex: http://artifactory:8081/artifactory/api/conan/devops-conan-local
+  CONAN_REMOTE_NAME: devops-remote
+
+jobs:
+  # -------------------------------------------------------------------
+  # Étape 1 : build + test + package chaque lib interne indépendamment.
+  # Matrice explicite plutôt qu'une boucle : chaque lib a ses propres
+  # dépendances et son propre ordre (protocol dépend de core, etc.),
+  # donc on les enchaîne dans des jobs séparés avec `needs`.
+  # -------------------------------------------------------------------
+  build-core:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Conan
+        run: pip install conan
+      - name: Configure Conan profile
+        run: conan profile detect --force
+      - name: Build & test devops-core
+        working-directory: libs/core
+        run: conan create . --version=0.1.0 --build=missing
+      - name: Add private remote
+        if: env.CONAN_REMOTE_URL != ''
+        run: conan remote add ${{ env.CONAN_REMOTE_NAME }} ${{ env.CONAN_REMOTE_URL }} || true
+      - name: Publish devops-core
+        if: github.ref == 'refs/heads/main' && env.CONAN_REMOTE_URL != ''
+        run: conan upload "devops-core/0.1.0" -r ${{ env.CONAN_REMOTE_NAME }} --confirm
+
+  build-protocol:
+    needs: build-core
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: pip install conan
+      - run: conan profile detect --force
+      - name: Build & test devops-protocol
+        working-directory: libs/protocol
+        run: conan create . --version=0.1.0 --build=missing
+      - name: Publish devops-protocol
+        if: github.ref == 'refs/heads/main' && env.CONAN_REMOTE_URL != ''
+        run: |
+          conan remote add ${{ env.CONAN_REMOTE_NAME }} ${{ env.CONAN_REMOTE_URL }} || true
+          conan upload "devops-protocol/0.1.0" -r ${{ env.CONAN_REMOTE_NAME }} --confirm
+
+  build-network:
+    needs: build-protocol
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: pip install conan
+      - run: conan profile detect --force
+      - name: Build & test devops-network
+        working-directory: libs/network
+        run: conan create . --version=0.1.0 --build=missing
+      - name: Publish devops-network
+        if: github.ref == 'refs/heads/main' && env.CONAN_REMOTE_URL != ''
+        run: |
+          conan remote add ${{ env.CONAN_REMOTE_NAME }} ${{ env.CONAN_REMOTE_URL }} || true
+          conan upload "devops-network/0.1.0" -r ${{ env.CONAN_REMOTE_NAME }} --confirm
+
+  # -------------------------------------------------------------------
+  # Étape 2 : backend, indépendant de Qt donc buildable sur un runner nu.
+  # -------------------------------------------------------------------
+  build-backend:
+    needs: build-network
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: devops
+          POSTGRES_PASSWORD: devops
+          POSTGRES_DB: devops_console
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - uses: actions/checkout@v4
+      - run: pip install conan
+      - run: conan profile detect --force
+      - name: Apply DB migrations
+        run: PGPASSWORD=devops psql -h localhost -U devops -d devops_console -f backend/db/migrations/0001_init.sql
+      - name: Install deps & build backend
+        working-directory: backend
+        run: |
+          conan install . --build=missing -of build
+          cmake --preset conan-release
+          cmake --build --preset conan-release
+
+  # -------------------------------------------------------------------
+  # Étape 3 : l'app Qt/QML nécessite un runner avec Qt installé.
+  # Séparée du reste car son temps de build est très différent
+  # (Qt + compilation QML) et ne doit pas ralentir le feedback backend.
+  # -------------------------------------------------------------------
+  build-app:
+    needs: build-network
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Qt
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: "6.7.*"
+          modules: "qtquickcontrols2"
+      - run: pip install conan
+      - run: conan profile detect --force
+      - name: Build ui-components then app
+        run: |
+          cd libs/ui-components && conan create . --version=0.1.0 --build=missing
+          cd ../../app
+          conan install . --build=missing -of build
+          cmake --preset conan-release
+          cmake --build --preset conan-release
