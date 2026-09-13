@@ -33,6 +33,7 @@ install(EXPORT devops-core-targets
     DESTINATION lib/cmake/devops-core
 )
 
+option(DEVOPS_BUILD_TESTS "Build unit tests" ON)
 if(DEVOPS_BUILD_TESTS)
     enable_testing()
     add_subdirectory(tests)
