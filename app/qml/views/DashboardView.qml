@@ -1,7 +1,7 @@
 import QtQuick
 import QtQuick.Controls.Basic
 import QtQuick.Layouts
-import DevopsUi
+import DevopsUi 1.0
 
 // Vue "tableau de bord" : un en-tête façon terminal (police mono pour le
 // titre, pas de bandeau eyebrow générique) au-dessus d'une grille de

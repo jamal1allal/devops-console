@@ -6,7 +6,9 @@ find_package(devops-core REQUIRED)
 find_package(devops-network REQUIRED)
 find_package(devops-ui-components REQUIRED)
 
-qt_standard_project_setup()
+# qt_standard_project_setup()
+
+qt_standard_project_setup(REQUIRES 6.5)
 
 qt_add_executable(devops-console-app
     src/main.cpp
@@ -20,6 +22,18 @@ qt_add_qml_module(devops-console-app
         qml/views/DashboardView.qml
 )
 
+
+# target_link_libraries(devops-console-app
+#     PRIVATE
+#         Qt6::Core
+#         Qt6::Qml
+#         Qt6::Quick
+#         devops::core
+#         devops::network
+#         devops::ui-components
+#         devops-ui-componentsplugin
+# )
+
 target_link_libraries(devops-console-app
     PRIVATE
         Qt6::Core
@@ -27,7 +41,12 @@ target_link_libraries(devops-console-app
         Qt6::Quick
         devops::core
         devops::network
+        # devops-ui-components
+        # devops-ui-componentsplugin
+        devops-ui-componentsplugin
         devops::ui-components
 )
+
+qt_import_qml_plugins(devops-console-app)
 
 target_compile_features(devops-console-app PRIVATE cxx_std_20)

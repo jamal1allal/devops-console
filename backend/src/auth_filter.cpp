@@ -5,6 +5,8 @@
 #include "core/config.h"
 #include "core/logger.h"
 
+#include <jwt-cpp/traits/nlohmann-json/traits.h>
+
 namespace devops::backend {
 
 using devops::core::Config;
@@ -28,10 +30,19 @@ void AuthFilter::doFilter(const drogon::HttpRequestPtr& req,
     const auto secret = Config::instance().get("JWT_SECRET", "dev-secret-change-me");
 
     try {
-        const auto decoded = jwt::decode(token);
-        const auto verifier = jwt::verify()
-                                   .allow_algorithm(jwt::algorithm::hs256{secret})
-                                   .with_issuer("devops-console-backend");
+        // const auto decoded = jwt::decode(token);
+        // const auto verifier = jwt::verify()
+        //                            .allow_algorithm(jwt::algorithm::hs256{secret})
+        //                            .with_issuer("devops-console-backend");
+        
+        
+        using traits = jwt::traits::nlohmann_json;
+
+        const auto decoded = jwt::decode<traits>(token);
+        const auto verifier = jwt::verify<traits>()
+                           .allow_algorithm(jwt::algorithm::hs256{secret})
+                           .with_issuer("devops-console-backend");
+
         verifier.verify(decoded);
         nextCallback();
     } catch (const std::exception& e) {

@@ -7,7 +7,7 @@ class DevopsAppConan(ConanFile):
     package_type = "application"
     settings = "os", "compiler", "build_type", "arch"
 
-    generators = "CMakeDeps", "CMakeToolchain"
+    # generators = "CMakeDeps", "CMakeToolchain"
 
     def requirements(self):
         # Qt n'est volontairement PAS géré par Conan ici : on s'appuie sur
@@ -15,8 +15,8 @@ class DevopsAppConan(ConanFile):
         # en entreprise pour éviter de rebuild Qt à chaque poste dev.
         self.requires("devops-core/0.1.0")
         self.requires("devops-protocol/0.1.0")
-        self.requires("devops-network/0.1.0")
-        self.requires("devops-ui-components/0.1.0")
+        self.requires("devops-network/0.1.3")
+        self.requires("devops-ui-components/0.1.1")
 
     def layout(self):
         cmake_layout(self)

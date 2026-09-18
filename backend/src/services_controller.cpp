@@ -8,6 +8,13 @@ namespace devops::backend {
 using devops::core::Logger;
 using devops::protocol::DeploymentEvent;
 
+static drogon::HttpResponsePtr jsonResponse(const nlohmann::json& json) {
+    auto resp = drogon::HttpResponse::newHttpResponse();
+    resp->setContentTypeCode(drogon::CT_APPLICATION_JSON);
+    resp->setBody(json.dump());
+    return resp;
+}
+
 void ServicesController::listServices(const drogon::HttpRequestPtr& req,
                                        std::function<void(const drogon::HttpResponsePtr&)>&& callback) {
     try {
@@ -17,7 +24,7 @@ void ServicesController::listServices(const drogon::HttpRequestPtr& req,
         for (const auto& service : services) {
             body["services"].push_back(service.toJson());
         }
-        auto resp = drogon::HttpResponse::newHttpJsonResponse(body);
+        auto resp = jsonResponse(body);
         callback(resp);
     } catch (const std::exception& e) {
         Logger::instance().error("ServicesController", std::string("listServices failed: ") + e.what());
@@ -32,7 +39,7 @@ void ServicesController::getService(const drogon::HttpRequestPtr& req,
                                      std::string id) {
     try {
         const auto service = m_repository.findById(id);
-        auto resp = drogon::HttpResponse::newHttpJsonResponse(service.toJson());
+        auto resp = jsonResponse(service.toJson());
         callback(resp);
     } catch (const std::exception& e) {
         Logger::instance().warning("ServicesController", "service not found: " + id);
@@ -51,7 +58,7 @@ void ServicesController::getHistory(const drogon::HttpRequestPtr& req,
     for (const auto& event : events) {
         body["events"].push_back(event.toJson());
     }
-    auto resp = drogon::HttpResponse::newHttpJsonResponse(body);
+    auto resp = jsonResponse(body);
     callback(resp);
 }
 

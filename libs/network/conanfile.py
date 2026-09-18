@@ -13,9 +13,9 @@ class DevopsNetworkConan(ConanFile):
 
     def requirements(self):
         self.requires("cpp-httplib/0.15.3")
-        self.requires("nlohmann_json/3.11.3")
-        self.requires("devops-core/0.1.0")
-        self.requires("devops-protocol/0.1.0")
+        self.requires("nlohmann_json/3.11.3", transitive_headers=True, transitive_libs=True)
+        self.requires("devops-core/0.1.0", transitive_headers=True, transitive_libs=True)
+        self.requires("devops-protocol/0.1.0", transitive_headers=True, transitive_libs=True)
 
     def config_options(self):
         if self.settings.os == "Windows":

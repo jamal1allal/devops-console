@@ -6,9 +6,7 @@ class DevopsBackendConan(ConanFile):
     name = "devops-backend"
     package_type = "application"
     settings = "os", "compiler", "build_type", "arch"
-
-    generators = "CMakeDeps", "CMakeToolchain"
-
+    
     def requirements(self):
         self.requires("drogon/1.9.4")
         self.requires("libpqxx/7.9.0")

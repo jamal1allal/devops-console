@@ -17,7 +17,7 @@ int main() {
 
     Logger::instance().info("main", "Starting devops-backend on port " + std::to_string(listenPort));
 
-    drogon::app().addDbClient(
+    drogon::app().createDbClient(
         "postgresql",
         dbHost,
         static_cast<unsigned short>(dbPort),

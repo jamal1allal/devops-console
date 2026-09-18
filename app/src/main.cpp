@@ -1,8 +1,14 @@
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
+#include <QtQml/qqmlextensionplugin.h>
 
 #include "core/config.h"
 #include "core/logger.h"
+
+using devops::core::Config;
+using devops::core::Logger;
+
+Q_IMPORT_QML_PLUGIN(DevopsUiPlugin)
 
 using namespace devops::core;
 

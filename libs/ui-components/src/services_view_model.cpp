@@ -26,7 +26,7 @@ QVariantMap statusToVariant(const protocol::ServiceStatus& status) {
 }  // namespace
 
 ServicesViewModel::ServicesViewModel(QObject* parent) : QObject(parent) {
-    const auto baseUrl = Config::instance().get("BACKEND_URL", "http://localhost:8080");
+    const auto baseUrl = Config::instance().get("BACKEND_URL", "http://localhost:8090");
     auto client = std::make_shared<network::RestClient>(baseUrl);
     m_api = std::make_shared<network::ServicesApi>(client);
 }

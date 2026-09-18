@@ -22,9 +22,9 @@ target_link_libraries(devops-network
     PUBLIC
         devops::core
         devops::protocol
+        nlohmann_json::nlohmann_json
     PRIVATE
         httplib::httplib
-        nlohmann_json::nlohmann_json
 )
 
 target_compile_features(devops-network PUBLIC cxx_std_20)

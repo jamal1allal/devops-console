@@ -13,7 +13,7 @@ class DevopsUiComponentsConan(ConanFile):
 
     def requirements(self):
         self.requires("devops-core/0.1.0")
-        self.requires("devops-network/0.1.0")
+        self.requires("devops-network/0.1.3")
 
     def config_options(self):
         if self.settings.os == "Windows":
@@ -34,6 +34,14 @@ class DevopsUiComponentsConan(ConanFile):
     def package(self):
         CMake(self).install()
 
+    
     def package_info(self):
-        self.cpp_info.libs = ["devops-ui-components"]
-        self.cpp_info.set_property("cmake_target_name", "devops::ui-components")
+        self.cpp_info.libs = [
+            "devops-ui-components",
+            "devops-ui-componentsplugin",
+        ]
+
+        self.cpp_info.set_property(
+            "cmake_target_name",
+            "devops::ui-components"
+        )
