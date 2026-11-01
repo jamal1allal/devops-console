@@ -26,6 +26,16 @@ jobs:
       - name: Detect Conan profile
         run: conan profile detect --force
 
+      - name: Pin CMake 3.x
+        uses: jwlawson/actions-setup-cmake@v2
+        with:
+          cmake-version: "3.31.x"
+
+      - name: Show CMake used
+        run: |
+          which -a cmake
+          cmake --version
+          
       # Drogon et ses dépendances sont longs à compiler : on garde le cache
       # Conan d'un run à l'autre, clé basée sur les recettes.
       - name: Cache Conan packages
