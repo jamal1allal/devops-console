@@ -18,6 +18,11 @@ jobs:
       - name: Install Conan
         run: pip install conan
 
+      - name: Pin CMake 3.x
+        run: |
+          pip install "cmake>=3.27,<4"
+          cmake --version
+
       - name: Detect Conan profile
         run: conan profile detect --force
 
