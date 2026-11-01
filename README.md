@@ -2,6 +2,8 @@
 
 [![CI](https://github.com/jamal1allal/devops-console/actions/workflows/ci.yml/badge.svg)](https://github.com/jamal1allal/devops-console/actions/workflows/ci.yml)
 
+[![CI](https://github.com/jamal1allal/devops-console/actions/workflows/ci.yml/badge.svg)](https://github.com/jamal1allal/devops-console/actions/workflows/ci.yml)
+
 Console de supervision interne : suivi de l'état de services/pipelines,
 historique en base, packagée comme un ensemble de libs C++ versionnées
 via Conan, publiées sur un dépôt privé (Artifactory / Conan Server).
