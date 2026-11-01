@@ -9,7 +9,7 @@ class DevopsBackendConan(ConanFile):
     
     def requirements(self):
         self.requires("drogon/1.9.4")
-        self.requires("libpqxx/7.9.0")
+        self.requires("libpqxx/7.9.2")
         self.requires("jwt-cpp/0.7.0")
         self.requires("nlohmann_json/3.11.3")
         # Dépendances internes, résolues depuis le dépôt privé
