@@ -2,11 +2,19 @@
 
 #include "core/config.h"
 #include "core/logger.h"
+#include "auth/jwt_service.h"
 
 using namespace devops::core;
 
 int main() {
     Config::instance().loadFromFile(".env");
+
+    try {
+        devops::backend::auth::JwtService::secret();  // échoue vite si absent
+    } catch (const std::exception& e) {
+        Logger::instance().error("main", e.what());
+        return 1;
+    }
 
     const auto dbHost = Config::instance().get("DB_HOST", "localhost");
     const auto dbPort = Config::instance().getInt("DB_PORT").value_or(5432);
