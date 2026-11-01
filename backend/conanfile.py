@@ -15,6 +15,7 @@ class DevopsBackendConan(ConanFile):
         # Dépendances internes, résolues depuis le dépôt privé
         self.requires("devops-core/0.1.0")
         self.requires("devops-protocol/0.1.0")
+        self.requires("libsodium/1.0.20")
 
     def layout(self):
         cmake_layout(self)
@@ -27,3 +28,12 @@ class DevopsBackendConan(ConanFile):
         cmake = CMake(self)
         cmake.configure()
         cmake.build()
+
+    def build_requirements(self):
+        self.test_requires("gtest/1.14.0")
+
+    default_options = {
+        "drogon/*:with_orm": True,
+        "drogon/*:with_postgres": True,
+        "drogon/*:with_postgres_batch": True,
+    }
